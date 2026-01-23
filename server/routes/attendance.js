@@ -145,6 +145,13 @@ router.get('/stats', auth, async (req, res) => {
             attendedClasses += stat.attended;
         });
 
+        // 3. Add initial stats from user profile
+        const user = await User.findById(req.user.id);
+        if (user && user.initialStats) {
+            totalClasses += user.initialStats.total || 0;
+            attendedClasses += user.initialStats.attended || 0;
+        }
+
         const overallPercentage = totalClasses === 0 ? 0 : (attendedClasses / totalClasses) * 100;
 
         res.json({

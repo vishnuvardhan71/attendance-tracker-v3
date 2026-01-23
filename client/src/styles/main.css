@@ -160,6 +160,14 @@ button,
     border: 1px solid #c3e6cb;
 }
 
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
 a {
     color: #667eea;
     cursor: pointer;
@@ -334,6 +342,14 @@ a:hover {
     height: 100%;
     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     transition: width 0.3s ease;
+}
+
+.progress-fill.bg-danger {
+    background: linear-gradient(90deg, #ff4d4d 0%, #dc3545 100%);
+}
+
+.progress-fill.bg-success {
+    background: linear-gradient(90deg, #28a745 0%, #218838 100%);
 }
 
 .stat-text {

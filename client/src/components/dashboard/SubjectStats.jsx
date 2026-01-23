@@ -35,7 +35,7 @@ const SubjectStats = ({ stats, loading }) => {
                                 <h4>{subject.name}</h4>
                                 <div className="progress-bar">
                                     <div
-                                        className="progress-fill"
+                                        className={`progress-fill ${percentage < 75 ? 'bg-danger' : 'bg-success'}`}
                                         style={{ width: `${percentage}%` }}
                                     ></div>
                                 </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { timetableService } from '../services/timetableService';
 import TimingsStep from '../components/setup/TimingsStep';
 import SubjectsStep from '../components/setup/SubjectsStep';
@@ -19,6 +19,7 @@ const SetupPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const updateConfig = (updates) => {
         setConfig({ ...config, ...updates });
@@ -35,7 +36,8 @@ const SetupPage = () => {
 
         try {
             await timetableService.saveConfig(config);
-            navigate('/dashboard');
+            const useSimple = location.state?.useSimpleDashboard !== false; // Default to true if coming from attendance-input
+            navigate(useSimple ? '/simple-dashboard' : '/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to save configuration');
         } finally {

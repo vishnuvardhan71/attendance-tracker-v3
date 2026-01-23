@@ -39,5 +39,10 @@ export const attendanceService = {
             overallPercentage: data.overallPercentage || 0,
             subjectStats: subjectStatsArray
         };
+    },
+
+    saveInitialStats: async (total, attended) => {
+        const response = await api.put('/auth/initial-stats', { total, attended });
+        return response.data;
     }
 };

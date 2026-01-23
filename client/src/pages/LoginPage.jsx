@@ -24,7 +24,7 @@ const LoginPage = () => {
             : await signup(username, password);
 
         if (result.success) {
-            navigate(isLogin ? '/dashboard' : '/setup');
+            navigate(isLogin ? '/dashboard' : '/attendance-input');
         } else {
             setError(result.error);
         }

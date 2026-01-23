@@ -25,6 +25,10 @@ const UserSchema = new mongoose.Schema({
     isSetupComplete: {
         type: Boolean,
         default: false
+    },
+    initialStats: {
+        total: { type: Number, default: 0 },
+        attended: { type: Number, default: 0 }
     }
 });
 

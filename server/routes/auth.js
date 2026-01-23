@@ -170,4 +170,29 @@ router.put('/config', auth, async (req, res) => {
     }
 });
 
+// @route   PUT api/auth/initial-stats
+// @desc    Update user initial attendance stats
+// @access  Private
+router.put('/initial-stats', auth, async (req, res) => {
+    const { total, attended } = req.body;
+
+    try {
+        let user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        user.initialStats = {
+            total: Number(total) || 0,
+            attended: Number(attended) || 0
+        };
+
+        await user.save();
+        res.json(user.initialStats);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+});
+
 module.exports = router;
