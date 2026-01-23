@@ -19,21 +19,16 @@ const StatsOverview = ({ stats, loading }) => {
 
     return (
         <div className="card mb-3">
-            <div className="card-body" style={{
-                display: 'flex',
-                gap: '20px',
-                justifyContent: 'space-around',
-                flexWrap: 'wrap'
-            }}>
-                <div className="progress-card" style={{ flex: 1, minWidth: '150px' }}>
+            <div className="card-body stats-grid">
+                <div className="progress-card">
                     <h2>{totalClasses}</h2>
                     <p>Total Classes</p>
                 </div>
-                <div className="progress-card" style={{ flex: 1, minWidth: '150px' }}>
+                <div className="progress-card">
                     <h2>{attendedClasses}</h2>
                     <p>Classes Attended</p>
                 </div>
-                <div className="progress-card" style={{ flex: 1, minWidth: '150px' }}>
+                <div className="progress-card">
                     <h2>{overallPercent}%</h2>
                     <p>Overall Attendance</p>
                 </div>

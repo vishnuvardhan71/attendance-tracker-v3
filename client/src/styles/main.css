@@ -176,9 +176,13 @@ a:hover {
     padding: 20px 30px;
     border-radius: 16px;
     margin-bottom: 30px;
-    display: flex;
-    justify-content: space-between;
     align-items: center;
+}
+
+.dashboard-header h1 {
+    color: white;
+    font-size: 24px;
+    margin: 0;
 }
 
 .dashboard-header button {
@@ -191,6 +195,8 @@ a:hover {
     padding: 20px;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     border-radius: 12px;
+    flex: 1;
+    min-width: 150px;
 }
 
 .progress-card h2 {
@@ -369,4 +375,25 @@ a:hover {
         gap: 15px;
         text-align: center;
     }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stats-grid {
+    display: flex;
+    gap: 20px;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.mt-2 {
+    margin-top: 20px;
 }

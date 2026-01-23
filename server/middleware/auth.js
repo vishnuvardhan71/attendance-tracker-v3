@@ -16,7 +16,11 @@ module.exports = function (req, res, next) {
 
     // Verify token
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        if (!process.env.JWT_SECRET) {
+            console.error('FATAL ERROR: JWT_SECRET is not defined.');
+            return res.status(500).json({ msg: 'Internal Server Error' });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded.user;
         next();
     } catch (err) {

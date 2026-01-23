@@ -29,7 +29,9 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
-            window.location.href = '/';
+            // Support for GitHub Pages sub-paths
+            const base = import.meta.env.BASE_URL || '/';
+            window.location.href = base;
         }
         return Promise.reject(error);
     }

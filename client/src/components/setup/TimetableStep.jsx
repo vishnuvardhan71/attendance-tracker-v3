@@ -21,17 +21,28 @@ const TimetableStep = ({ config, updateConfig, goToStep, handleFinish, loading }
 
     const generateTimeSlots = () => {
         const slots = [];
-        const [startHour, startMin] = config.startTime.split(':').map(Number);
-        const [endHour, endMin] = config.endTime.split(':').map(Number);
-        const [lunchHour, lunchMin] = config.lunchStart.split(':').map(Number);
+        if (!config.startTime || !config.endTime || !config.lunchStart) {
+            return [];
+        }
+
+        const [startHour, startMin] = config.startTime.split(':').map(val => parseInt(val) || 0);
+        const [endHour, endMin] = config.endTime.split(':').map(val => parseInt(val) || 0);
+        const [lunchHour, lunchMin] = config.lunchStart.split(':').map(val => parseInt(val) || 0);
 
         let currentTime = startHour * 60 + startMin;
         const endTime = endHour * 60 + endMin;
         const lunchTime = lunchHour * 60 + lunchMin;
-        const periodDuration = Number(config.periodDuration) || 45;
-        const lunchDuration = Number(config.lunchDuration) || 45;
+        const periodDuration = parseInt(config.periodDuration) || 45;
+        const lunchDuration = parseInt(config.lunchDuration) || 45;
 
-        while (currentTime < endTime) {
+        // Prevent infinite loops or invalid ranges
+        if (endTime <= currentTime || periodDuration <= 0) {
+            return [];
+        }
+
+        let safetyCounter = 0;
+        while (currentTime < endTime && safetyCounter < 50) {
+            safetyCounter++;
             // Check if it's lunch time
             if (currentTime === lunchTime) {
                 slots.push('Lunch Break');
@@ -40,6 +51,9 @@ const TimetableStep = ({ config, updateConfig, goToStep, handleFinish, loading }
                 const hour = Math.floor(currentTime / 60);
                 const min = currentTime % 60;
                 const nextTime = currentTime + periodDuration;
+
+                // Don't let a period extend past the end time or lunch start abruptly if not aligned
+                // but for now, just calculate next slot
                 const nextHour = Math.floor(nextTime / 60);
                 const nextMin = nextTime % 60;
 
@@ -55,10 +69,14 @@ const TimetableStep = ({ config, updateConfig, goToStep, handleFinish, loading }
     };
 
     const handleSubjectChange = (day, slotIndex, subject) => {
-        const updatedTimetable = { ...timetable };
-        updatedTimetable[day][slotIndex].subject = subject;
-        setTimetable(updatedTimetable);
-        updateConfig({ timetable: updatedTimetable });
+        setTimetable(prev => {
+            if (!prev[day] || !prev[day][slotIndex]) return prev;
+            const updatedDay = [...prev[day]];
+            updatedDay[slotIndex] = { ...updatedDay[slotIndex], subject };
+            const updatedTimetable = { ...prev, [day]: updatedDay };
+            updateConfig({ timetable: updatedTimetable });
+            return updatedTimetable;
+        });
     };
 
     const handleSave = () => {
@@ -69,40 +87,26 @@ const TimetableStep = ({ config, updateConfig, goToStep, handleFinish, loading }
     return (
         <div>
             <h2>Step 3: Create Timetable</h2>
-            <p style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>
+            <p className="setup-info-text">
                 Map your subjects to time slots.
             </p>
 
-            <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+            <div className="timetable-scroll-area">
                 {days.map((day) => (
-                    <div key={day} style={{
-                        marginBottom: '20px',
-                        border: '1px solid #eee',
-                        padding: '15px',
-                        borderRadius: '8px'
-                    }}>
-                        <h3 style={{ marginBottom: '15px', fontSize: '16px' }}>{day}</h3>
+                    <div key={day} className="day-setup-card">
+                        <h3 className="day-setup-title">{day}</h3>
                         {timetable[day]?.map((slot, index) => (
-                            <div key={index} style={{
-                                display: 'flex',
-                                gap: '10px',
-                                marginBottom: '10px',
-                                alignItems: 'center'
-                            }}>
-                                <label style={{
-                                    width: '150px',
-                                    fontSize: '12px',
-                                    margin: 0
-                                }}>
+                            <div key={index} className="slot-setup-row">
+                                <label className="slot-setup-label">
                                     {slot.time}
                                 </label>
                                 {slot.time === 'Lunch Break' ? (
-                                    <span style={{ fontSize: '14px', color: '#999' }}>Lunch Break</span>
+                                    <span className="lunch-break-text">Lunch Break</span>
                                 ) : (
                                     <select
+                                        className="slot-setup-select"
                                         value={slot.subject}
                                         onChange={(e) => handleSubjectChange(day, index, e.target.value)}
-                                        style={{ flex: 1 }}
                                     >
                                         <option value="">-- No Class --</option>
                                         {config.subjects.map((subject, idx) => (
@@ -116,7 +120,7 @@ const TimetableStep = ({ config, updateConfig, goToStep, handleFinish, loading }
                 ))}
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            <div className="setup-actions">
                 <button className="btn-secondary" onClick={() => goToStep(2)} disabled={loading}>
                     Back
                 </button>

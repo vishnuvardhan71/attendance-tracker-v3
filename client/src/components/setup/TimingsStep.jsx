@@ -32,7 +32,7 @@ const TimingsStep = ({ config, updateConfig, goToStep }) => {
                 <input
                     type="number"
                     value={config.periodDuration}
-                    onChange={(e) => handleChange('periodDuration', parseInt(e.target.value))}
+                    onChange={(e) => handleChange('periodDuration', parseInt(e.target.value) || 0)}
                 />
             </div>
 
@@ -50,7 +50,7 @@ const TimingsStep = ({ config, updateConfig, goToStep }) => {
                 <input
                     type="number"
                     value={config.lunchDuration}
-                    onChange={(e) => handleChange('lunchDuration', parseInt(e.target.value))}
+                    onChange={(e) => handleChange('lunchDuration', parseInt(e.target.value) || 0)}
                 />
             </div>
 

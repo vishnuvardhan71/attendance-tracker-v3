@@ -5,11 +5,12 @@ const Attendance = require('../models/Attendance');
 const Timetable = require('../models/Timetable');
 const User = require('../models/User');
 
-// Helper to get day name
+// Helper to get day name (robust alternative to locale-dependent methods)
 const getDayName = (dateStr) => {
     const [year, month, day] = dateStr.split('-').map(Number);
     const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString('en-US', { weekday: 'long' });
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[date.getDay()];
 };
 
 // @route   GET api/attendance/date/:date
@@ -36,7 +37,6 @@ router.get('/date/:date', auth, async (req, res) => {
         const daySchedule = timetable.schedule[dayName];
 
         if (!daySchedule || daySchedule.length === 0) {
-            // It might be a weekend or no classes
             return res.json({
                 formattedDate: date,
                 isHoliday: false,
@@ -44,22 +44,19 @@ router.get('/date/:date', auth, async (req, res) => {
             });
         }
 
-        // Filter out free periods if you want, or keep them to show gaps
-        // The requirement says "Skip lunch break slot". Lunch is likely handled in frontend rendering or configuration, 
-        // but if it's in the timetable slots, we filter here.
-        // Assuming timetable slots have a type.
-
-        const validSlots = daySchedule.map(slot => ({
-            periodTime: slot.time,
-            subject: slot.subject,
-            status: 'Absent' // Default status for new day
-        }));
+        const validSlots = daySchedule
+            .filter(slot => slot.time !== 'Lunch Break' && slot.subject)
+            .map(slot => ({
+                periodTime: slot.time,
+                subject: slot.subject,
+                status: 'Absent'
+            }));
 
         return res.json({
             formattedDate: date,
             isHoliday: false,
             records: validSlots,
-            isNew: true // Flag to tell frontend this is generated
+            isNew: true
         });
 
     } catch (err) {
@@ -72,18 +69,20 @@ router.get('/date/:date', auth, async (req, res) => {
 // @desc    Save/Mark attendance for a date
 // @access  Private
 router.post('/', auth, async (req, res) => {
-    const { date, isHoliday, records } = req.body; // date is YYYY-MM-DD string
+    const { date, isHoliday, records } = req.body;
 
     try {
+        if (!date || isHoliday === undefined || !records) {
+            return res.status(400).json({ msg: 'Please provide all required fields' });
+        }
+
         let attendance = await Attendance.findOne({ user: req.user.id, formattedDate: date });
 
         if (attendance) {
-            // Update
             attendance.isHoliday = isHoliday;
             attendance.records = records;
             await attendance.save();
         } else {
-            // Create
             attendance = new Attendance({
                 user: req.user.id,
                 date: new Date(date),
@@ -102,45 +101,48 @@ router.post('/', auth, async (req, res) => {
 });
 
 // @route   GET api/attendance/stats
-// @desc    Get attendance statistics
+// @desc    Get attendance statistics using MongoDB Aggregation
 // @access  Private
 router.get('/stats', auth, async (req, res) => {
     try {
-        const allAttendance = await Attendance.find({ user: req.user.id });
-        const timetable = await Timetable.findOne({ user: req.user.id });
+        const mongoose = require('mongoose');
+        const userId = new mongoose.Types.ObjectId(req.user.id);
 
+        // 1. Aggregate attendance data
+        const stats = await Attendance.aggregate([
+            { $match: { user: userId, isHoliday: false } },
+            { $unwind: "$records" },
+            { $match: { "records.status": { $ne: "Holiday" } } },
+            {
+                $group: {
+                    _id: "$records.subject",
+                    total: { $sum: 1 },
+                    attended: { $sum: { $cond: [{ $eq: ["$records.status", "Present"] }, 1, 0] } }
+                }
+            }
+        ]);
+
+        // 2. Fetch timetable to ensure all subjects are represented and calculate overall
+        const timetable = await Timetable.findOne({ user: req.user.id });
+        const subjectStats = {};
         let totalClasses = 0;
         let attendedClasses = 0;
-        const subjectStats = {};
 
-        // 1. Initialize subjectStats with all subjects from timetable configuration
+        // Initialize with all subjects from config
         if (timetable && timetable.config && timetable.config.subjects) {
             timetable.config.subjects.forEach(subject => {
                 subjectStats[subject] = { total: 0, attended: 0 };
             });
         }
 
-        // 2. Aggregate attendance from all marked records
-        allAttendance.forEach(day => {
-            if (day.isHoliday) return; // Skip holidays
-
-            day.records.forEach(record => {
-                // Ensure subject entry exists
-                if (!subjectStats[record.subject]) {
-                    subjectStats[record.subject] = { total: 0, attended: 0 };
-                }
-
-                // Only count if status is not Holiday
-                if (record.status !== 'Holiday') {
-                    subjectStats[record.subject].total++;
-                    totalClasses++;
-
-                    if (record.status === 'Present') {
-                        subjectStats[record.subject].attended++;
-                        attendedClasses++;
-                    }
-                }
-            });
+        // Fill in aggregation results
+        stats.forEach(stat => {
+            subjectStats[stat._id] = {
+                total: stat.total,
+                attended: stat.attended
+            };
+            totalClasses += stat.total;
+            attendedClasses += stat.attended;
         });
 
         const overallPercentage = totalClasses === 0 ? 0 : (attendedClasses / totalClasses) * 100;

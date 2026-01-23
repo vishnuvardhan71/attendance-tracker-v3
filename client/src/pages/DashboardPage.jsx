@@ -40,7 +40,7 @@ const DashboardPage = () => {
         <div className="container">
             {/* Dashboard Header */}
             <div className="dashboard-header">
-                <h1 style={{ color: 'white', fontSize: '24px' }}>📊 Dashboard</h1>
+                <h1>📊 Dashboard</h1>
                 <button className="btn-danger" onClick={handleLogout}>
                     Logout
                 </button>
@@ -50,14 +50,14 @@ const DashboardPage = () => {
             <StatsOverview stats={stats} loading={loading} />
 
             {/* Main Content Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div className="dashboard-grid">
                 {/* Left Column: Mark Attendance */}
                 <AttendanceMarker onAttendanceSaved={handleAttendanceSaved} />
 
                 {/* Right Column: Subject Stats */}
                 <div>
                     <SubjectStats stats={stats} loading={loading} />
-                    <div className="card" style={{ marginTop: '20px' }}>
+                    <div className="card mt-2">
                         <div className="card-body text-center">
                             <button
                                 className="btn-secondary"

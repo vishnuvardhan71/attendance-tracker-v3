@@ -9,6 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.set('trust proxy', 1); // For rate limiting behind proxies
 app.use(cors());
 app.use(express.json());
 
@@ -28,4 +29,11 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Please close the other process or use a different port.`);
+    } else {
+        console.error('Server error:', err);
+    }
+    process.exit(1);
 });
