@@ -4,6 +4,7 @@ import { timetableService } from '../services/timetableService';
 import TimingsStep from '../components/setup/TimingsStep';
 import SubjectsStep from '../components/setup/SubjectsStep';
 import TimetableStep from '../components/setup/TimetableStep';
+import DotGrid from '../components/common/DotGrid';
 
 const SetupPage = () => {
     const [currentStep, setCurrentStep] = useState(1);
@@ -46,51 +47,53 @@ const SetupPage = () => {
     };
 
     return (
-        <div className="container">
-            <div className="card">
-                <div className="card-header">
-                    <h1>⚙️ Setup Your Tracker</h1>
-                    <p>Configure your college schedule</p>
-                </div>
-                <div className="card-body">
-                    {/* Step Indicator */}
-                    <div className="step-indicator">
-                        <div className={`step-dot ${currentStep >= 1 ? 'active' : ''}`}></div>
-                        <div className={`step-dot ${currentStep >= 2 ? 'active' : ''}`}></div>
-                        <div className={`step-dot ${currentStep >= 3 ? 'active' : ''}`}></div>
+        <div className="home-page setup-page">
+            <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '40px' }}>
+                <div className="card" style={{ maxWidth: currentStep === 3 ? '1000px' : '600px', margin: '0 auto' }}>
+                    <div className="card-header">
+                        <h1>⚙️ Setup Your Tracker</h1>
+                        <p>Configure your college schedule</p>
                     </div>
-
-                    {error && (
-                        <div className="alert alert-danger">
-                            {error}
+                    <div className="card-body">
+                        {/* Step Indicator */}
+                        <div className="step-indicator">
+                            <div className={`step-dot ${currentStep >= 1 ? 'active' : ''}`}></div>
+                            <div className={`step-dot ${currentStep >= 2 ? 'active' : ''}`}></div>
+                            <div className={`step-dot ${currentStep >= 3 ? 'active' : ''}`}></div>
                         </div>
-                    )}
 
-                    {currentStep === 1 && (
-                        <TimingsStep
-                            config={config}
-                            updateConfig={updateConfig}
-                            goToStep={goToStep}
-                        />
-                    )}
+                        {error && (
+                            <div className="alert alert-danger">
+                                {error}
+                            </div>
+                        )}
 
-                    {currentStep === 2 && (
-                        <SubjectsStep
-                            config={config}
-                            updateConfig={updateConfig}
-                            goToStep={goToStep}
-                        />
-                    )}
+                        {currentStep === 1 && (
+                            <TimingsStep
+                                config={config}
+                                updateConfig={updateConfig}
+                                goToStep={goToStep}
+                            />
+                        )}
 
-                    {currentStep === 3 && (
-                        <TimetableStep
-                            config={config}
-                            updateConfig={updateConfig}
-                            goToStep={goToStep}
-                            handleFinish={handleFinish}
-                            loading={loading}
-                        />
-                    )}
+                        {currentStep === 2 && (
+                            <SubjectsStep
+                                config={config}
+                                updateConfig={updateConfig}
+                                goToStep={goToStep}
+                            />
+                        )}
+
+                        {currentStep === 3 && (
+                            <TimetableStep
+                                config={config}
+                                updateConfig={updateConfig}
+                                goToStep={goToStep}
+                                handleFinish={handleFinish}
+                                loading={loading}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

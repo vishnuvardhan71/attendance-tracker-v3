@@ -10,6 +10,9 @@ const Header = () => {
                         <span className="logo-text">Attendly</span>
                     </Link>
                 </div>
+                <nav className="nav-links">
+                    <Link to="/guide" className="nav-btn guide-btn">How to Use</Link>
+                </nav>
             </div>
         </header>
     );

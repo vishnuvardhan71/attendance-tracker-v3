@@ -5,6 +5,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
+    const [user, setUser] = useState(authService.getUser());
     const [loading, setLoading] = useState(false);
 
     const login = async (username, password) => {
@@ -12,6 +13,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await authService.login(username, password);
             setIsAuthenticated(true);
+            setUser(username);
             return { success: true };
         } catch (error) {
             return {
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await authService.signup(username, password);
             setIsAuthenticated(true);
+            setUser(username);
             return { success: true };
         } catch (error) {
             return {
@@ -42,10 +45,18 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         authService.logout();
         setIsAuthenticated(false);
+        setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, signup, logout, loading }}>
+        <AuthContext.Provider value={{
+            isAuthenticated,
+            login,
+            signup,
+            logout,
+            loading,
+            user
+        }}>
             {children}
         </AuthContext.Provider>
     );

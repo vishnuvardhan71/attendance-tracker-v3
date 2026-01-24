@@ -89,18 +89,14 @@ const AttendanceMarker = ({ onAttendanceSaved }) => {
                     />
                 </div>
 
-                <div className="checkbox-wrapper mb-3" style={{
-                    background: '#fff3cd',
-                    padding: '10px',
-                    borderRadius: '8px'
-                }}>
+                <div className="checkbox-wrapper holiday-wrapper mb-3">
                     <input
                         type="checkbox"
                         id="holidayCheck"
                         checked={isHoliday}
                         onChange={toggleHoliday}
                     />
-                    <label htmlFor="holidayCheck" style={{ margin: 0, color: '#856404' }}>
+                    <label htmlFor="holidayCheck">
                         This day is a Holiday
                     </label>
                 </div>

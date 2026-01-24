@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import GuidePage from './pages/GuidePage';
 import InitialAttendancePage from './pages/InitialAttendancePage';
 import SetupPage from './pages/SetupPage';
 import DashboardPage from './pages/DashboardPage';
@@ -16,6 +17,7 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/guide" element={<GuidePage />} />
                     <Route path="/login" element={<LoginPage initialIsLogin={true} />} />
                     <Route path="/signup" element={<LoginPage initialIsLogin={false} />} />
                     <Route
