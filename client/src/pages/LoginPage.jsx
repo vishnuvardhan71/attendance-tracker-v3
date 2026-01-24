@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const LoginPage = () => {
-    const [isLogin, setIsLogin] = useState(true);
+const LoginPage = ({ initialIsLogin = true }) => {
+    const [isLogin, setIsLogin] = useState(initialIsLogin);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');

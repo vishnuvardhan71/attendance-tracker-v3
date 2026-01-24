@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
+import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import InitialAttendancePage from './pages/InitialAttendancePage';
 import SetupPage from './pages/SetupPage';
@@ -14,7 +15,9 @@ function App() {
         <AuthProvider>
             <Router>
                 <Routes>
-                    <Route path="/" element={<LoginPage />} />
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/login" element={<LoginPage initialIsLogin={true} />} />
+                    <Route path="/signup" element={<LoginPage initialIsLogin={false} />} />
                     <Route
                         path="/attendance-input"
                         element={
