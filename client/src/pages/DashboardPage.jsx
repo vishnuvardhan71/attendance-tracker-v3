@@ -15,7 +15,6 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const fromSimple = location.state?.fromSimple;
-    const startDate = location.state?.startDate;
 
     useEffect(() => {
         loadStats();
@@ -46,18 +45,9 @@ const DashboardPage = () => {
             <Header />
 
             <div className="container" style={{ position: 'relative', zIndex: 10, paddingBottom: '40px' }}>
-                {fromSimple && (
-                    <div className="alert alert-success text-center mb-4" style={{
-                        background: 'rgba(79, 70, 229, 0.15)',
-                        border: '1px solid rgba(79, 70, 229, 0.3)',
-                        color: 'white',
-                        borderRadius: '16px',
-                        padding: '16px',
-                        backdropFilter: 'blur(8px)'
-                    }}>
-                        Welcome <strong>{user}</strong>! You are marking attendance from <strong>{startDate}</strong>.
-                    </div>
-                )}
+                <div className="welcome-banner mb-4">
+                    <h2>Welcome <span className="text-gradient">{user || 'User'}</span>! 👋</h2>
+                </div>
                 {/* Dashboard Header */}
                 <div className="dashboard-header">
                     <h1>📊 Dashboard</h1>

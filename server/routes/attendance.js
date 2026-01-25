@@ -108,22 +108,25 @@ router.get('/stats', auth, async (req, res) => {
         const mongoose = require('mongoose');
         const userId = new mongoose.Types.ObjectId(req.user.id);
 
-        // 1. Aggregate attendance data
-        const stats = await Attendance.aggregate([
-            { $match: { user: userId, isHoliday: false } },
-            { $unwind: "$records" },
-            { $match: { "records.status": { $ne: "Holiday" } } },
-            {
-                $group: {
-                    _id: "$records.subject",
-                    total: { $sum: 1 },
-                    attended: { $sum: { $cond: [{ $eq: ["$records.status", "Present"] }, 1, 0] } }
+        // 1. Fetch aggregation results, timetable, user profile, and first attendance date in parallel
+        const [stats, timetable, user, firstRecord] = await Promise.all([
+            Attendance.aggregate([
+                { $match: { user: userId, isHoliday: false } },
+                { $unwind: "$records" },
+                { $match: { "records.status": { $ne: "Holiday" } } },
+                {
+                    $group: {
+                        _id: "$records.subject",
+                        total: { $sum: 1 },
+                        attended: { $sum: { $cond: [{ $eq: ["$records.status", "Present"] }, 1, 0] } }
+                    }
                 }
-            }
+            ]),
+            Timetable.findOne({ user: req.user.id }),
+            User.findById(req.user.id),
+            Attendance.findOne({ user: req.user.id }).sort({ date: 1 }) // Find earliest record
         ]);
 
-        // 2. Fetch timetable to ensure all subjects are represented and calculate overall
-        const timetable = await Timetable.findOne({ user: req.user.id });
         const subjectStats = {};
         let totalClasses = 0;
         let attendedClasses = 0;
@@ -145,8 +148,7 @@ router.get('/stats', auth, async (req, res) => {
             attendedClasses += stat.attended;
         });
 
-        // 3. Add initial stats from user profile
-        const user = await User.findById(req.user.id);
+        // Add initial stats from user profile
         if (user && user.initialStats) {
             totalClasses += user.initialStats.total || 0;
             attendedClasses += user.initialStats.attended || 0;
@@ -154,11 +156,16 @@ router.get('/stats', auth, async (req, res) => {
 
         const overallPercentage = totalClasses === 0 ? 0 : (attendedClasses / totalClasses) * 100;
 
+        // Determine earliest attendance date from records or fallback to today
+        const rawDate = firstRecord ? firstRecord.date : new Date();
+        const firstDate = new Date(rawDate).toLocaleDateString('en-GB');
+
         res.json({
             totalClasses,
             attendedClasses,
             overallPercentage,
-            subjectStats
+            subjectStats,
+            firstDate
         });
 
     } catch (err) {

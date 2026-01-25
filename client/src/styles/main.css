@@ -20,6 +20,28 @@ body {
     padding: 20px;
 }
 
+.welcome-banner {
+    margin-bottom: 24px;
+}
+
+.welcome-banner h2 {
+    font-size: 1.8rem;
+    /* Reduced from 2.2rem for better fit */
+    font-weight: 700;
+    color: white;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-muted {
+    color: #94a3b8;
+}
+
 .auth-container {
     display: flex;
     justify-content: center;
