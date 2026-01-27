@@ -25,10 +25,10 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const signup = async (username, password) => {
+    const signup = async (username, password, email, fullName) => {
         setLoading(true);
         try {
-            await authService.signup(username, password);
+            await authService.signup(username, password, email, fullName);
             setIsAuthenticated(true);
             setUser(username);
             return { success: true };

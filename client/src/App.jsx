@@ -9,6 +9,7 @@ import InitialAttendancePage from './pages/InitialAttendancePage';
 import SetupPage from './pages/SetupPage';
 import DashboardPage from './pages/DashboardPage';
 import SimpleDashboardPage from './pages/SimpleDashboardPage';
+import CoursesPage from './pages/CoursesPage';
 import './styles/main.css';
 
 function App() {
@@ -33,6 +34,14 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <SetupPage />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/courses"
+                        element={
+                            <PrivateRoute>
+                                <CoursesPage />
                             </PrivateRoute>
                         }
                     />

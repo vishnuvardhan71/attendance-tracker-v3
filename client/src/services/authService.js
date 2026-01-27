@@ -10,8 +10,8 @@ export const authService = {
         return response.data;
     },
 
-    signup: async (username, password) => {
-        const response = await api.post('/auth/signup', { username, password });
+    signup: async (username, password, email, fullName) => {
+        const response = await api.post('/auth/signup', { username, password, email, fullName });
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', username);

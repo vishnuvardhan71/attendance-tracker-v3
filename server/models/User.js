@@ -10,6 +10,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    email: {
+        type: String,
+        unique: true,
+        sparse: true // Allows null/undefined for existing users, effectively optional for legacy but required for new
+    },
+    fullName: {
+        type: String
+    },
     collegeTimings: {
         startTime: { type: String, default: '09:00' },
         endTime: { type: String, default: '16:30' },

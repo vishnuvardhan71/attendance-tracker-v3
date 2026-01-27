@@ -7,6 +7,9 @@ const LoginPage = ({ initialIsLogin = true }) => {
     const [isLogin, setIsLogin] = useState(initialIsLogin);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [fullName, setFullName] = useState('');
     const [error, setError] = useState('');
     const { login, signup, loading } = useAuth();
     const navigate = useNavigate();
@@ -15,17 +18,22 @@ const LoginPage = ({ initialIsLogin = true }) => {
         e.preventDefault();
         setError('');
 
-        if (!username || !password) {
+        if (!isLogin && password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        if (!username || !password || (!isLogin && (!email || !fullName || !confirmPassword))) {
             setError('Please fill in all fields');
             return;
         }
 
         const result = isLogin
             ? await login(username, password)
-            : await signup(username, password);
+            : await signup(username, password, email, fullName);
 
         if (result.success) {
-            navigate(isLogin ? '/dashboard' : '/attendance-input');
+            navigate(isLogin ? '/courses' : '/courses');
         } else {
             setError(result.error);
         }
@@ -36,6 +44,9 @@ const LoginPage = ({ initialIsLogin = true }) => {
         setError('');
         setUsername('');
         setPassword('');
+        setConfirmPassword('');
+        setEmail('');
+        setFullName('');
     };
 
     return (
@@ -43,18 +54,14 @@ const LoginPage = ({ initialIsLogin = true }) => {
             <div className="container auth-container">
                 <div className="card auth-card">
                     <div className="card-header">
-                        <h1>📚 Attendance Tracker</h1>
+                        <h1>Attendance Tracker</h1>
                         <p>Track your attendance effortlessly</p>
                     </div>
                     <div className="card-body">
                         <form onSubmit={handleSubmit}>
                             <h2 className="text-center mb-3">{isLogin ? 'Login' : 'Sign Up'}</h2>
 
-                            {error && (
-                                <div className="alert alert-danger">
-                                    {error}
-                                </div>
-                            )}
+
 
                             <div className="form-group">
                                 <label>Username</label>
@@ -67,6 +74,32 @@ const LoginPage = ({ initialIsLogin = true }) => {
                                 />
                             </div>
 
+                            {!isLogin && (
+                                <>
+                                    <div className="form-group">
+                                        <label>Full Name</label>
+                                        <input
+                                            type="text"
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            required
+                                            disabled={loading}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Email</label>
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                            disabled={loading}
+                                        />
+                                    </div>
+                                </>
+                            )}
+
                             <div className="form-group">
                                 <label>Password</label>
                                 <input
@@ -76,7 +109,40 @@ const LoginPage = ({ initialIsLogin = true }) => {
                                     required
                                     disabled={loading}
                                 />
+                                {!isLogin && (
+                                    <small className="form-text text-muted" style={{ color: '#aaa', fontSize: '0.8rem' }}>
+                                        Must be at least 6 characters.
+                                    </small>
+                                )}
                             </div>
+
+                            {!isLogin && (
+                                <div className="form-group">
+                                    <label>Confirm Password</label>
+                                    <input
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                        disabled={loading}
+                                    />
+                                </div>
+                            )}
+
+                            {error && (
+                                <div className="alert alert-danger" style={{
+                                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                                    border: '1px solid #ef4444',
+                                    color: '#f87171',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    marginBottom: '20px',
+                                    fontWeight: '600',
+                                    textAlign: 'center'
+                                }}>
+                                    {error}
+                                </div>
+                            )}
 
                             <button type="submit" className="btn-primary" disabled={loading}>
                                 {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Sign Up')}

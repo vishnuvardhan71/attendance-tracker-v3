@@ -35,7 +35,7 @@ const InitialAttendancePage = () => {
             <div className="container auth-container">
                 <div className="card auth-card">
                     <div className="card-header">
-                        <h1>📊 Welcome!</h1>
+                        <h1>Welcome!</h1>
                         <p>Let's get started with your attendance</p>
                     </div>
                     <div className="card-body">

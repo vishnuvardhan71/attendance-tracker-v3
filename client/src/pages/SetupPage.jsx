@@ -4,7 +4,8 @@ import { timetableService } from '../services/timetableService';
 import TimingsStep from '../components/setup/TimingsStep';
 import SubjectsStep from '../components/setup/SubjectsStep';
 import TimetableStep from '../components/setup/TimetableStep';
-import DotGrid from '../components/common/DotGrid';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 
 const SetupPage = () => {
     const [currentStep, setCurrentStep] = useState(1);
@@ -48,11 +49,24 @@ const SetupPage = () => {
 
     return (
         <div className="home-page setup-page">
-            <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '40px' }}>
+            <Header />
+
+            {/* Header extension visually connected to main header */}
+            <div className="header-extension">
+                <div className="header-extension-container">
+                    <h1 style={{ color: 'white', margin: 0, fontSize: '24px', fontWeight: '700' }}>Setup Your Tracker</h1>
+                    <p style={{ color: '#94a3b8', margin: 0, fontSize: '14px' }}>Step {currentStep} of 3</p>
+                </div>
+            </div>
+
+            <div className="container" style={{ position: 'relative', zIndex: 10, paddingBottom: '40px' }}>
                 <div className="card" style={{ maxWidth: currentStep === 3 ? '1000px' : '600px', margin: '0 auto' }}>
                     <div className="card-header">
-                        <h1>⚙️ Setup Your Tracker</h1>
-                        <p>Configure your college schedule</p>
+                        <h2>
+                            {currentStep === 1 ? 'College Timings' :
+                                currentStep === 2 ? 'Add Subjects' :
+                                    'Create Timetable'}
+                        </h2>
                     </div>
                     <div className="card-body">
                         {/* Step Indicator */}
@@ -96,6 +110,7 @@ const SetupPage = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 };

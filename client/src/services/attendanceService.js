@@ -1,7 +1,7 @@
 import api from './api';
 
 export const attendanceService = {
-    markAttendance: async (date, slots, isHoliday) => {
+    markAttendance: async (date, slots, isHoliday, courseId) => {
         // Convert frontend format to backend format
         const records = slots.map(slot => ({
             periodTime: slot.time || '',
@@ -12,7 +12,8 @@ export const attendanceService = {
         const response = await api.post('/attendance', {
             date,
             isHoliday,
-            records
+            records,
+            courseId
         });
         return response.data;
     },

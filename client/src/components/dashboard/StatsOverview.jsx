@@ -48,11 +48,11 @@ const StatsOverview = ({ stats, loading }) => {
                 <div className="target-message text-center">
                     {overallPercent >= 75 ? (
                         <p className="text-success" style={{ fontWeight: '600' }}>
-                            🎉 Great job! You are above 75%. Keep it up!
+                            Great job! You are above 75%. Keep it up!
                         </p>
                     ) : (
                         <p className="text-danger" style={{ fontWeight: '600' }}>
-                            ⚠️ You need to attend <strong>{neededClasses}</strong> more classes to reach 75%.
+                            You need to attend <strong>{neededClasses}</strong> more classes to reach 75%.
                         </p>
                     )}
                 </div>

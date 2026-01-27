@@ -233,9 +233,64 @@ a:hover {
     margin: 0;
 }
 
-.dashboard-header button {
+.dashboard-header button,
+.header-back-btn {
     width: auto;
     padding: 10px 20px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.header-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+}
+
+.header-extension {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+
+.header-extension-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+    align-items: center;
+}
+
+.header-extension-container h1 {
+    grid-column: 2;
+    text-align: center;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.header-extension-container .btn-danger,
+.header-extension-container .header-right-content {
+    grid-column: 3;
+    justify-self: end;
 }
 
 .progress-card {
@@ -527,8 +582,7 @@ a:hover {
     position: relative;
     z-index: 10;
     padding: 24px 0;
-    background: #0b1121;
-    /* Darker than background */
+    background: #0f172a;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -861,4 +915,33 @@ a:hover {
     color: #94a3b8;
     font-size: 14px;
     margin-bottom: 15px;
+}
+
+/* Animations */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Guide Page Fullscreen */
+.guide-page-fullscreen {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }

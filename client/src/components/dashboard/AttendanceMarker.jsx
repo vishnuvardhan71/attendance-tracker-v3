@@ -62,7 +62,8 @@ const AttendanceMarker = ({ onAttendanceSaved }) => {
                 status: attendance[index] || 'Absent'
             }));
 
-            await attendanceService.markAttendance(date, attendanceSlots, isHoliday);
+            const courseId = localStorage.getItem('selectedCourse');
+            await attendanceService.markAttendance(date, attendanceSlots, isHoliday, courseId);
             setMessage('Attendance saved successfully!');
             onAttendanceSaved();
 

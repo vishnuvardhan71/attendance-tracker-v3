@@ -17,6 +17,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/timetable', require('./routes/timetable'));
 app.use('/api/attendance', require('./routes/attendance'));
+app.use('/api/courses', require('./routes/courses'));
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/college-attendance')

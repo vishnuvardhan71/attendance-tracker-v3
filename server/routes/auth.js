@@ -15,6 +15,8 @@ router.post(
     authLimiter,
     [
         check('username', 'Username is required').not().isEmpty(),
+        check('email', 'Please include a valid email').isEmail(),
+        check('fullName', 'Full Name is required').not().isEmpty(),
         check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
     ],
     async (req, res) => {
@@ -23,7 +25,7 @@ router.post(
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { username, password } = req.body;
+        const { username, password, email, fullName } = req.body;
 
         try {
             let user = await User.findOne({ username });
@@ -32,9 +34,16 @@ router.post(
                 return res.status(400).json({ msg: 'User already exists' });
             }
 
+            user = await User.findOne({ email });
+            if (user) {
+                return res.status(400).json({ msg: 'Email already registered' });
+            }
+
             user = new User({
                 username,
                 password,
+                email,
+                fullName
             });
 
             const salt = await bcrypt.genSalt(10);

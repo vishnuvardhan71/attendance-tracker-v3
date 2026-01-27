@@ -69,7 +69,7 @@ router.get('/date/:date', auth, async (req, res) => {
 // @desc    Save/Mark attendance for a date
 // @access  Private
 router.post('/', auth, async (req, res) => {
-    const { date, isHoliday, records } = req.body;
+    const { date, isHoliday, records, courseId } = req.body;
 
     try {
         if (!date || isHoliday === undefined || !records) {
@@ -81,10 +81,12 @@ router.post('/', auth, async (req, res) => {
         if (attendance) {
             attendance.isHoliday = isHoliday;
             attendance.records = records;
+            if (courseId) attendance.course = courseId; // Update course association if provided
             await attendance.save();
         } else {
             attendance = new Attendance({
                 user: req.user.id,
+                course: courseId, // Link to course
                 date: new Date(date),
                 formattedDate: date,
                 isHoliday,
