@@ -60,9 +60,15 @@ const CoursesPage = () => {
         }
     };
 
-    const handleCourseClick = (courseId) => {
-        localStorage.setItem('selectedCourse', courseId);
-        navigate('/dashboard');
+    const handleCourseClick = (course) => {
+        localStorage.setItem('selectedCourse', course._id);
+        localStorage.setItem('selectedCourseIndex', course.index);
+
+        if (course.isSetupComplete) {
+            navigate(`/dashboard/${course.index}`);
+        } else {
+            navigate('/attendance-input', { state: { courseId: course._id, index: course.index } });
+        }
     };
 
     return (
@@ -83,20 +89,21 @@ const CoursesPage = () => {
                         textAlign: 'center'
                     }}>
                         <h2 style={{ margin: '0 0 15px 0', fontSize: '1.8rem', letterSpacing: '1px', color: '#fff' }}>YOUR COURSES</h2>
-                        <button
-                            className="btn-primary"
-                            style={{
-                                width: 'auto',
-                                padding: '10px 24px',
-                                fontSize: '1rem',
-                                fontWeight: '600',
-                                borderRadius: '12px'
-                            }}
-                            onClick={() => setShowModal(true)}
-                            disabled={courses.length >= 3}
-                        >
-                            + Add Course
-                        </button>
+                        {courses.length < 2 && (
+                            <button
+                                className="btn-primary"
+                                style={{
+                                    width: 'auto',
+                                    padding: '10px 24px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    borderRadius: '12px'
+                                }}
+                                onClick={() => setShowModal(true)}
+                            >
+                                + Add Course
+                            </button>
+                        )}
                     </div>
                     <div className="card-body" style={{ padding: '30px' }}>
                         {loading ? (
@@ -146,7 +153,7 @@ const CoursesPage = () => {
                                             e.currentTarget.style.boxShadow = 'none';
                                             e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
                                         }}
-                                        onClick={() => handleCourseClick(course._id)}
+                                        onClick={() => handleCourseClick(course)}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
                                             <div style={{ flex: 1 }}>

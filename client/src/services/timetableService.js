@@ -1,8 +1,8 @@
 import api from './api';
 
 export const timetableService = {
-    getConfig: async () => {
-        const response = await api.get('/timetable/config');
+    getConfig: async (courseId) => {
+        const response = await api.get(`/timetable/config?courseId=${courseId}`);
         return response.data;
     },
 
@@ -11,8 +11,8 @@ export const timetableService = {
         return response.data;
     },
 
-    getTimetable: async (date) => {
-        const response = await api.get(`/timetable/day?date=${date}`);
+    getTimetable: async (date, courseId) => {
+        const response = await api.get(`/timetable/day?date=${date}&courseId=${courseId}`);
         return response.data;
     }
 };

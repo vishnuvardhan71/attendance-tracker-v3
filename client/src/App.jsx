@@ -46,7 +46,7 @@ function App() {
                         }
                     />
                     <Route
-                        path="/dashboard"
+                        path="/dashboard/:index"
                         element={
                             <PrivateRoute>
                                 <DashboardPage />
@@ -54,7 +54,7 @@ function App() {
                         }
                     />
                     <Route
-                        path="/simple-dashboard"
+                        path="/simple-dashboard/:index"
                         element={
                             <PrivateRoute>
                                 <SimpleDashboardPage />

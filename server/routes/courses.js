@@ -11,11 +11,15 @@ router.post('/', auth, async (req, res) => {
     try {
         const { name, year, semester } = req.body;
 
-        // Check if user already has 3 courses
-        const count = await Course.countDocuments({ user: req.user.id });
-        if (count >= 3) {
-            return res.status(400).json({ msg: 'Maximum limit of 3 courses reached' });
+        // Check if user already has 2 courses
+        const courses = await Course.find({ user: req.user.id });
+        if (courses.length >= 2) {
+            return res.status(400).json({ msg: 'Maximum limit of 2 courses reached' });
         }
+
+        // Assign index 0 or 1
+        const existingIndices = courses.map(c => c.index);
+        const index = existingIndices.includes(0) ? 1 : 0;
 
         // Check for duplicate name
         const existing = await Course.findOne({ user: req.user.id, name });
@@ -27,7 +31,8 @@ router.post('/', auth, async (req, res) => {
             user: req.user.id,
             name,
             year,
-            semester
+            semester,
+            index
         });
 
         const course = await newCourse.save();

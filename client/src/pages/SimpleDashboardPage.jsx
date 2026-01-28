@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { attendanceService } from '../services/attendanceService';
+import { courseService } from '../services/courseService';
 import StatsOverview from '../components/dashboard/StatsOverview';
 import AttendanceMarker from '../components/dashboard/AttendanceMarker';
 import Header from '../components/layout/Header';
@@ -9,22 +10,46 @@ import Footer from '../components/layout/Footer';
 
 const SimpleDashboardPage = () => {
     const [stats, setStats] = useState(null);
+    const [currentCourse, setCurrentCourse] = useState(null);
     const [loading, setLoading] = useState(true);
     const { logout, user } = useAuth();
     const navigate = useNavigate();
+    const { index } = useParams();
 
     useEffect(() => {
-        loadStats();
-    }, []);
+        const fetchCourseAndStats = async () => {
+            try {
+                const courses = await courseService.getCourses();
+                const course = courses.find(c => c.index === parseInt(index));
+
+                if (!course) {
+                    navigate('/courses');
+                    return;
+                }
+
+                setCurrentCourse(course);
+                localStorage.setItem('selectedCourse', course._id);
+                localStorage.setItem('selectedCourseIndex', course.index);
+
+                const data = await attendanceService.getStats(course._id);
+                setStats(data);
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourseAndStats();
+    }, [index, navigate]);
 
     const loadStats = async () => {
+        if (!currentCourse) return;
         try {
-            const data = await attendanceService.getStats();
+            const data = await attendanceService.getStats(currentCourse._id);
             setStats(data);
         } catch (error) {
             console.error('Failed to load stats:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -62,7 +87,7 @@ const SimpleDashboardPage = () => {
                     border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
                     <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#fff', fontWeight: '600' }}>
-                        Simple Dashboard
+                        Simple Dashboard - {currentCourse?.name || ''}
                     </h2>
                     <button
                         className="btn-danger"
@@ -76,14 +101,14 @@ const SimpleDashboardPage = () => {
                 <StatsOverview stats={stats} loading={loading} />
 
                 <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr' }}>
-                    <AttendanceMarker onAttendanceSaved={handleAttendanceSaved} />
+                    <AttendanceMarker onAttendanceSaved={handleAttendanceSaved} courseId={currentCourse?._id} />
                 </div>
 
                 <div className="card mt-2">
                     <div className="card-body text-center">
                         <button
                             className="btn-secondary"
-                            onClick={() => navigate('/dashboard', {
+                            onClick={() => navigate(`/dashboard/${index}`, {
                                 state: {
                                     fromSimple: true,
                                     startDate: new Date().toLocaleDateString('en-GB')

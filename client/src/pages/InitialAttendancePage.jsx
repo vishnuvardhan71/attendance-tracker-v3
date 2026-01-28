@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { attendanceService } from '../services/attendanceService';
 import DotGrid from '../components/common/DotGrid';
 
@@ -7,6 +7,7 @@ const InitialAttendancePage = () => {
     const [attendance, setAttendance] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,8 +16,9 @@ const InitialAttendancePage = () => {
             // Treat percentage as attended classes out of 100 base classes
             // This allows it to be averaged correctly with future data.
             const percentage = parseFloat(attendance);
-            await attendanceService.saveInitialStats(100, percentage);
-            navigate('/setup', { state: { useSimpleDashboard: true } });
+            const courseId = location.state?.courseId || localStorage.getItem('selectedCourse');
+            await attendanceService.saveInitialStats(100, percentage, courseId);
+            navigate('/setup', { state: { useSimpleDashboard: true, courseId } });
         } catch (error) {
             console.error('Failed to save initial attendance:', error);
             // Even if it fails, let's allow them to continue to setup
@@ -27,7 +29,8 @@ const InitialAttendancePage = () => {
     };
 
     const handleSkip = () => {
-        navigate('/setup', { state: { useSimpleDashboard: false } });
+        const courseId = location.state?.courseId || localStorage.getItem('selectedCourse');
+        navigate('/setup', { state: { useSimpleDashboard: false, courseId } });
     };
 
     return (

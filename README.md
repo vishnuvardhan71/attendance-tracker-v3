@@ -1,4 +1,4 @@
-# 📊 Pro Attendance Tracker
+# 📊 AttendIt - Pro Attendance Tracker
 
 A full-stack (MERN) web application designed for college students to track their attendance effortlessly, monitor their eligibility for exams (75% threshold), and manage their class schedules.
 

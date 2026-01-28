@@ -1,11 +1,11 @@
-# How to Use Attendly 📚
+# How to Use AttendIt 📚
 
-Attendly is your personal college attendance tracker designed to help you stay eligible and succeed. Follow this guide to get the most out of the platform.
+AttendIt is your personal college attendance tracker designed to help you stay eligible and succeed. Follow this guide to get the most out of the platform.
 
 ---
 
 ## 1. Getting Started 🚀
-- **Home Page**: Explore the landing page to understand what Attendly offers.
+- **Home Page**: Explore the landing page to understand what AttendIt offers.
 - **Sign Up**: Create a new account using a unique username and password.
 - **Login**: Access your existing data securely.
 
@@ -40,7 +40,7 @@ After your first login, you'll go through a quick setup process:
 - **Overall Attendance**: Your total percentage across all subjects.
 - **Subject-Wise Stats**: Track individual subject performance.
 - **Eligibility Alerts**:
-    - Attendly calculates how many classes you can afford to miss or how many you MUST attend to reach your target (e.g., 75%).
+    - AttendIt calculates how many classes you can afford to miss or how many you MUST attend to reach your target (e.g., 75%).
     - **Green**: You're on track!
     - **Red**: Caution! You need to attend more classes.
 
@@ -53,4 +53,4 @@ After your first login, you'll go through a quick setup process:
 
 ---
 
-*Set goals, mark daily, and succeed with Attendly!*
+*Set goals, mark daily, and succeed with AttendIt!*

@@ -37,9 +37,12 @@ const SetupPage = () => {
         setError('');
 
         try {
-            await timetableService.saveConfig(config);
+            const courseId = location.state?.courseId || localStorage.getItem('selectedCourse');
+            const dataWithCourse = { ...config, courseId };
+            await timetableService.saveConfig(dataWithCourse);
             const useSimple = location.state?.useSimpleDashboard !== false; // Default to true if coming from attendance-input
-            navigate(useSimple ? '/simple-dashboard' : '/dashboard');
+            const index = location.state?.index || localStorage.getItem('selectedCourseIndex');
+            navigate(useSimple ? `/simple-dashboard/${index}` : `/dashboard/${index}`);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to save configuration');
         } finally {

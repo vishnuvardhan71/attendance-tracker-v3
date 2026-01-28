@@ -7,7 +7,7 @@ const Header = () => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
 
-    // Determine where "Attendly" logo should navigate
+    // Determine where "AttendIt" logo should navigate
     const logoDestination = isAuthenticated ? '/courses' : '/';
 
     // Check if we're on the guide page
@@ -26,7 +26,7 @@ const Header = () => {
                         </button>
                     ) : (
                         <Link to={logoDestination}>
-                            <span className="logo-text">Attendly</span>
+                            <span className="logo-text">AttendIt</span>
                         </Link>
                     )}
                 </div>

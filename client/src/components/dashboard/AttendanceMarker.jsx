@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { timetableService } from '../../services/timetableService';
 import { attendanceService } from '../../services/attendanceService';
 
-const AttendanceMarker = ({ onAttendanceSaved }) => {
+const AttendanceMarker = ({ onAttendanceSaved, courseId: propCourseId }) => {
+    const courseId = propCourseId || localStorage.getItem('selectedCourse');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [slots, setSlots] = useState([]);
     const [attendance, setAttendance] = useState({});
@@ -11,17 +12,22 @@ const AttendanceMarker = ({ onAttendanceSaved }) => {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
-        loadTimetable();
-    }, [date]);
+        if (courseId) {
+            loadTimetable();
+        }
+    }, [date, courseId]);
 
     const loadTimetable = async () => {
+        if (!courseId || courseId === 'undefined' || courseId === 'null') return;
         try {
-            const data = await timetableService.getTimetable(date);
+            const data = await timetableService.getTimetable(date, courseId);
             setSlots(data.slots || []);
+            setAttendance({}); // Reset attendance when switching course or date
+            setIsHoliday(false);
 
             // Load existing attendance if any
             try {
-                const existingAttendance = await attendanceService.getAttendance(date);
+                const existingAttendance = await attendanceService.getAttendance(date, courseId);
                 if (existingAttendance && existingAttendance.records) {
                     setIsHoliday(existingAttendance.isHoliday || false);
                     const attendanceMap = {};
@@ -62,7 +68,7 @@ const AttendanceMarker = ({ onAttendanceSaved }) => {
                 status: attendance[index] || 'Absent'
             }));
 
-            const courseId = localStorage.getItem('selectedCourse');
+
             await attendanceService.markAttendance(date, attendanceSlots, isHoliday, courseId);
             setMessage('Attendance saved successfully!');
             onAttendanceSaved();

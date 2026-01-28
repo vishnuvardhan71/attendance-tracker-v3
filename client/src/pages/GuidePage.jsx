@@ -16,7 +16,7 @@ const GuidePage = () => {
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
                 }}>
                     <div className="card-header">
-                        <h1>How to Use Attendly</h1>
+                        <h1>How to Use AttendIt</h1>
                     </div>
                     <div className="card-body" style={{ color: '#cbd5e1', lineHeight: '1.8', fontSize: '1.05rem' }}>
                         <section className="mb-3">
@@ -60,7 +60,7 @@ const GuidePage = () => {
                             borderLeft: '4px solid #667eea'
                         }}>
                             <p style={{ fontSize: '1.1rem', fontStyle: 'italic', margin: 0 }}>
-                                "Mark daily, stay eligible, succeed with Attendly."
+                                "Mark daily, stay eligible, succeed with AttendIt."
                             </p>
                         </div>
                     </div>

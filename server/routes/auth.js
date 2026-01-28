@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const auth = require('../middleware/auth');
 const User = require('../models/User');
+const Course = require('../models/Course');
 const { authLimiter } = require('../middleware/rateLimiter');
 
 // @route   POST api/auth/signup
@@ -183,21 +185,25 @@ router.put('/config', auth, async (req, res) => {
 // @desc    Update user initial attendance stats
 // @access  Private
 router.put('/initial-stats', auth, async (req, res) => {
-    const { total, attended } = req.body;
+    const { total, attended, courseId } = req.body;
 
     try {
-        let user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(404).json({ msg: 'User not found' });
+        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+            return res.status(400).json({ msg: 'Valid courseId is required' });
         }
 
-        user.initialStats = {
+        let course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ msg: 'Course not found' });
+        }
+
+        course.initialStats = {
             total: Number(total) || 0,
             attended: Number(attended) || 0
         };
 
-        await user.save();
-        res.json(user.initialStats);
+        await course.save();
+        res.json(course.initialStats);
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });

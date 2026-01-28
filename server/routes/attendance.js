@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const Attendance = require('../models/Attendance');
 const Timetable = require('../models/Timetable');
 const User = require('../models/User');
+const Course = require('../models/Course');
 
 // Helper to get day name (robust alternative to locale-dependent methods)
 const getDayName = (dateStr) => {
@@ -19,17 +21,23 @@ const getDayName = (dateStr) => {
 router.get('/date/:date', auth, async (req, res) => {
     try {
         const { date } = req.params; // YYYY-MM-DD
+        const { courseId } = req.query;
+
+        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+            return res.status(400).json({ msg: 'Valid courseId is required' });
+        }
+
         const dayName = getDayName(date);
 
         // 1. Check if record exists
-        let attendance = await Attendance.findOne({ user: req.user.id, formattedDate: date });
+        let attendance = await Attendance.findOne({ user: req.user.id, formattedDate: date, course: courseId });
 
         if (attendance) {
             return res.json(attendance);
         }
 
-        // 2. If no record, fetch user timetable to generate preview
-        const timetable = await Timetable.findOne({ user: req.user.id });
+        // 2. If no record, fetch course timetable to generate preview
+        const timetable = await Timetable.findOne({ user: req.user.id, course: courseId });
         if (!timetable) {
             return res.status(404).json({ msg: 'Timetable not set up' });
         }
@@ -72,11 +80,16 @@ router.post('/', auth, async (req, res) => {
     const { date, isHoliday, records, courseId } = req.body;
 
     try {
-        if (!date || isHoliday === undefined || !records) {
-            return res.status(400).json({ msg: 'Please provide all required fields' });
+        if (!date || isHoliday === undefined || !records || !courseId) {
+            return res.status(400).json({ msg: 'Please provide all required fields including courseId' });
         }
 
-        let attendance = await Attendance.findOne({ user: req.user.id, formattedDate: date });
+        if (!mongoose.Types.ObjectId.isValid(courseId)) {
+            console.error(`Invalid courseId in POST: ${courseId}`);
+            return res.status(400).json({ msg: 'Valid courseId is required' });
+        }
+
+        let attendance = await Attendance.findOne({ user: req.user.id, formattedDate: date, course: courseId });
 
         if (attendance) {
             attendance.isHoliday = isHoliday;
@@ -97,8 +110,8 @@ router.post('/', auth, async (req, res) => {
 
         res.json(attendance);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Attendance Save Error:', err);
+        res.status(500).json({ msg: `Server Error: ${err.message}` });
     }
 });
 
@@ -107,13 +120,18 @@ router.post('/', auth, async (req, res) => {
 // @access  Private
 router.get('/stats', auth, async (req, res) => {
     try {
-        const mongoose = require('mongoose');
-        const userId = new mongoose.Types.ObjectId(req.user.id);
+        const { courseId } = req.query;
+        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+            return res.status(400).json({ msg: 'Valid courseId is required' });
+        }
 
-        // 1. Fetch aggregation results, timetable, user profile, and first attendance date in parallel
-        const [stats, timetable, user, firstRecord] = await Promise.all([
+        const userId = new mongoose.Types.ObjectId(req.user.id);
+        const courseObjectId = new mongoose.Types.ObjectId(courseId);
+
+        // 1. Fetch aggregation results, timetable, course, and first attendance record
+        const [stats, timetable, course, firstRecord] = await Promise.all([
             Attendance.aggregate([
-                { $match: { user: userId, isHoliday: false } },
+                { $match: { user: userId, course: courseObjectId, isHoliday: false } },
                 { $unwind: "$records" },
                 { $match: { "records.status": { $ne: "Holiday" } } },
                 {
@@ -124,9 +142,9 @@ router.get('/stats', auth, async (req, res) => {
                     }
                 }
             ]),
-            Timetable.findOne({ user: req.user.id }),
-            User.findById(req.user.id),
-            Attendance.findOne({ user: req.user.id }).sort({ date: 1 }) // Find earliest record
+            Timetable.findOne({ user: req.user.id, course: courseId }),
+            Course.findById(courseId),
+            Attendance.findOne({ user: req.user.id, course: courseId }).sort({ date: 1 }) // Find earliest record
         ]);
 
         const subjectStats = {};
@@ -150,10 +168,10 @@ router.get('/stats', auth, async (req, res) => {
             attendedClasses += stat.attended;
         });
 
-        // Add initial stats from user profile
-        if (user && user.initialStats) {
-            totalClasses += user.initialStats.total || 0;
-            attendedClasses += user.initialStats.attended || 0;
+        // Add initial stats from course profile
+        if (course && course.initialStats) {
+            totalClasses += course.initialStats.total || 0;
+            attendedClasses += course.initialStats.attended || 0;
         }
 
         const overallPercentage = totalClasses === 0 ? 0 : (attendedClasses / totalClasses) * 100;

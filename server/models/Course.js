@@ -18,6 +18,18 @@ const CourseSchema = new mongoose.Schema({
         type: String, // e.g., "1" to "8"
         required: true
     },
+    index: {
+        type: Number, // 0 or 1
+        required: true
+    },
+    isSetupComplete: {
+        type: Boolean,
+        default: false
+    },
+    initialStats: {
+        total: { type: Number, default: 0 },
+        attended: { type: Number, default: 0 }
+    },
     createdAt: {
         type: Date,
         default: Date.now

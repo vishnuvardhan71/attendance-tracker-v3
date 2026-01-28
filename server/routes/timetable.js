@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const Timetable = require('../models/Timetable');
 const User = require('../models/User');
+const Course = require('../models/Course');
 
 // @route   POST api/timetable/config
 // @desc    Save timetable configuration
@@ -10,8 +12,13 @@ const User = require('../models/User');
 router.post('/config', auth, async (req, res) => {
     try {
         const configData = req.body;
+        const { courseId } = configData;
 
-        let timetable = await Timetable.findOne({ user: req.user.id });
+        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+            return res.status(400).json({ message: 'Valid courseId is required' });
+        }
+
+        let timetable = await Timetable.findOne({ user: req.user.id, course: courseId });
 
         if (timetable) {
             // Update existing configuration
@@ -26,9 +33,9 @@ router.post('/config', auth, async (req, res) => {
             };
             await timetable.save();
         } else {
-            // Create new configuration
             timetable = new Timetable({
                 user: req.user.id,
+                course: courseId,
                 schedule: configData.timetable || {},
                 config: {
                     startTime: configData.startTime,
@@ -42,8 +49,10 @@ router.post('/config', auth, async (req, res) => {
             await timetable.save();
         }
 
-        // Mark setup as complete
-        await User.findByIdAndUpdate(req.user.id, { isSetupComplete: true });
+        // Mark setup as complete for this course
+        if (courseId) {
+            await Course.findByIdAndUpdate(courseId, { isSetupComplete: true });
+        }
 
         res.json({ message: 'Configuration saved successfully', timetable });
     } catch (err) {
@@ -57,7 +66,10 @@ router.post('/config', auth, async (req, res) => {
 // @access  Private
 router.get('/config', auth, async (req, res) => {
     try {
-        const timetable = await Timetable.findOne({ user: req.user.id });
+        const { courseId } = req.query;
+        if (!courseId) return res.status(400).json({ message: 'CourseId is required' });
+
+        const timetable = await Timetable.findOne({ user: req.user.id, course: courseId });
         if (!timetable) {
             return res.status(404).json({ message: 'Configuration not found' });
         }
@@ -73,11 +85,11 @@ router.get('/config', auth, async (req, res) => {
 // @access  Private
 router.get('/day', auth, async (req, res) => {
     try {
-        const { date } = req.query;
+        const { date, courseId } = req.query;
         const [year, month, day] = date.split('-').map(Number);
         const dayOfWeek = new Date(year, month - 1, day).toLocaleDateString('en-US', { weekday: 'long' });
 
-        const timetable = await Timetable.findOne({ user: req.user.id });
+        const timetable = await Timetable.findOne({ user: req.user.id, course: courseId });
         if (!timetable || !timetable.schedule) {
             return res.json({ slots: [] });
         }
@@ -99,35 +111,31 @@ router.get('/day', auth, async (req, res) => {
 });
 
 // @route   POST api/timetable
-// @desc    Create or Update User Timetable
+// @desc    Create or Update User Timetable (Legacy/Direct)
 // @access  Private
 router.post('/', auth, async (req, res) => {
-    const { schedule } = req.body;
+    const { schedule, courseId } = req.body;
 
     try {
-        let timetable = await Timetable.findOne({ user: req.user.id });
+        if (!courseId) return res.status(400).json({ msg: 'courseId is required' });
+
+        let timetable = await Timetable.findOne({ user: req.user.id, course: courseId });
 
         if (timetable) {
             // Update
-            timetable = await Timetable.findOneAndUpdate(
-                { user: req.user.id },
-                { $set: { schedule } },
-                { new: true }
-            );
+            timetable.schedule = schedule;
+            await timetable.save();
             return res.json(timetable);
         }
 
         // Create
         timetable = new Timetable({
             user: req.user.id,
+            course: courseId,
             schedule
         });
 
         await timetable.save();
-
-        // Also mark setup as complete if not already
-        await User.findByIdAndUpdate(req.user.id, { isSetupComplete: true });
-
         res.json(timetable);
     } catch (err) {
         console.error(err.message);
@@ -140,7 +148,10 @@ router.post('/', auth, async (req, res) => {
 // @access  Private
 router.get('/', auth, async (req, res) => {
     try {
-        const timetable = await Timetable.findOne({ user: req.user.id });
+        const { courseId } = req.query;
+        if (!courseId) return res.status(400).json({ msg: 'courseId is required' });
+
+        const timetable = await Timetable.findOne({ user: req.user.id, course: courseId });
         if (!timetable) {
             return res.status(404).json({ msg: 'Timetable not found' });
         }

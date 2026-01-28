@@ -18,13 +18,13 @@ export const attendanceService = {
         return response.data;
     },
 
-    getAttendance: async (date) => {
-        const response = await api.get(`/attendance/date/${date}`);
+    getAttendance: async (date, courseId) => {
+        const response = await api.get(`/attendance/date/${date}?courseId=${courseId}`);
         return response.data;
     },
 
-    getStats: async () => {
-        const response = await api.get('/attendance/stats');
+    getStats: async (courseId) => {
+        const response = await api.get(`/attendance/stats?courseId=${courseId}`);
         const data = response.data;
 
         // Transform subjectStats object to array format expected by frontend
@@ -42,8 +42,8 @@ export const attendanceService = {
         };
     },
 
-    saveInitialStats: async (total, attended) => {
-        const response = await api.put('/auth/initial-stats', { total, attended });
+    saveInitialStats: async (total, attended, courseId) => {
+        const response = await api.put('/auth/initial-stats', { total, attended, courseId });
         return response.data;
     }
 };

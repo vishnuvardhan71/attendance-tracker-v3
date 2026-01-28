@@ -36,7 +36,7 @@ const AttendanceSchema = new mongoose.Schema({
     }]
 });
 
-// Compound index to ensure one record per user per date
-AttendanceSchema.index({ user: 1, formattedDate: 1 }, { unique: true });
+// Compound index to ensure one record per user per date per course
+AttendanceSchema.index({ user: 1, formattedDate: 1, course: 1 }, { unique: true });
 
 module.exports = mongoose.model('Attendance', AttendanceSchema);

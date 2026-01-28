@@ -69,14 +69,12 @@ const TimetableStep = ({ config, updateConfig, goToStep, handleFinish, loading }
     };
 
     const handleSubjectChange = (day, slotIndex, subject) => {
-        setTimetable(prev => {
-            if (!prev[day] || !prev[day][slotIndex]) return prev;
-            const updatedDay = [...prev[day]];
-            updatedDay[slotIndex] = { ...updatedDay[slotIndex], subject };
-            const updatedTimetable = { ...prev, [day]: updatedDay };
-            updateConfig({ timetable: updatedTimetable });
-            return updatedTimetable;
-        });
+        const updatedDay = [...timetable[day]];
+        updatedDay[slotIndex] = { ...updatedDay[slotIndex], subject };
+        const updatedTimetable = { ...timetable, [day]: updatedDay };
+
+        setTimetable(updatedTimetable);
+        updateConfig({ timetable: updatedTimetable });
     };
 
     const handleSave = () => {
