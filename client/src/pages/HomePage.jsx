@@ -43,6 +43,7 @@ const HomePage = () => {
 
             <main className="hero-section">
                 <div className="hero-content">
+                    <img src="/logo.png" alt="AttendIt Logo" className="hero-logo" />
                     <h1 className="brand-name">AttendIt</h1>
                     <p className="typing-effect">{typedText}<span className="cursor">|</span></p>
 
