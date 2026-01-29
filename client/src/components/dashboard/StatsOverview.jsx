@@ -43,6 +43,12 @@ const StatsOverview = ({ stats, loading }) => {
                             ></div>
                         </div>
                     </div>
+                    {overallPercent < 75 && (
+                        <div className="progress-card">
+                            <h2>{neededClasses}</h2>
+                            <p>Classes Needed for 75%</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="target-message text-center">

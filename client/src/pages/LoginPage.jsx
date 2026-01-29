@@ -11,6 +11,7 @@ const LoginPage = ({ initialIsLogin = true }) => {
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const { login, signup, loading } = useAuth();
     const navigate = useNavigate();
 
@@ -103,12 +104,23 @@ const LoginPage = ({ initialIsLogin = true }) => {
                             <div className="form-group">
                                 <label>Password</label>
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                     disabled={loading}
+                                    placeholder="Enter your password"
                                 />
+                                {isLogin && (
+                                    <button
+                                        type="button"
+                                        className="password-toggle"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showPassword ? "👁️‍🗨️" : "👁️"}
+                                    </button>
+                                )}
                                 {!isLogin && (
                                     <small className="form-text text-muted" style={{ color: '#aaa', fontSize: '0.8rem' }}>
                                         Must be at least 6 characters.
