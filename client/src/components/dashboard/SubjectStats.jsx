@@ -31,7 +31,7 @@ const SubjectStats = ({ stats, loading }) => {
                             : 0;
 
                         return (
-                            <div key={index} className="subject-stat">
+                            <div key={index} className={`subject-stat ${percentage < 75 ? 'danger' : ''}`}>
                                 <h4>{subject.name}</h4>
                                 <div className="progress-bar">
                                     <div
@@ -39,7 +39,7 @@ const SubjectStats = ({ stats, loading }) => {
                                         style={{ width: `${percentage}%` }}
                                     ></div>
                                 </div>
-                                <p className="stat-text">
+                                <p className={`stat-text ${percentage < 75 ? 'text-danger' : 'text-success'}`}>
                                     {subject.attended} / {subject.total} classes ({percentage}%)
                                 </p>
                             </div>

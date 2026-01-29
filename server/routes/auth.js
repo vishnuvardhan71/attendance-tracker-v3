@@ -197,6 +197,11 @@ router.put('/initial-stats', auth, async (req, res) => {
             return res.status(404).json({ msg: 'Course not found' });
         }
 
+        // Ownership check
+        if (course.user.toString() !== req.user.id) {
+            return res.status(401).json({ msg: 'Not authorized' });
+        }
+
         course.initialStats = {
             total: Number(total) || 0,
             attended: Number(attended) || 0
@@ -205,8 +210,8 @@ router.put('/initial-stats', auth, async (req, res) => {
         await course.save();
         res.json(course.initialStats);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Initial Stats Error:', err);
+        res.status(500).json({ msg: 'Server Error', error: err.message });
     }
 });
 

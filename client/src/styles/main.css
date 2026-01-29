@@ -505,11 +505,13 @@ a:hover {
 }
 
 .progress-bar {
-    background: #e0e0e0;
+    background: rgba(255, 255, 255, 0.05);
+    /* Darker background for dark theme */
     height: 8px;
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .progress-fill {
@@ -527,8 +529,13 @@ a:hover {
 }
 
 .stat-text {
-    font-size: 12px;
-    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.subject-stat.danger {
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    background: rgba(220, 53, 69, 0.05);
 }
 
 .step-indicator {

@@ -20,7 +20,7 @@ const CourseSchema = new mongoose.Schema({
     },
     index: {
         type: Number, // 0 or 1
-        required: true
+        default: 0
     },
     isSetupComplete: {
         type: Boolean,
