@@ -6,7 +6,7 @@ import DotGrid from '../components/common/DotGrid';
 
 const HomePage = () => {
     const [typedText, setTypedText] = useState('');
-    const fullText = "Mark daily, stay eligible, succeed with AttendIt.";
+    const fullText = "Mark daily, stay eligible, succeed with AttenlyX.";
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -43,8 +43,8 @@ const HomePage = () => {
 
             <main className="hero-section">
                 <div className="hero-content">
-                    <img src="/logo.png" alt="AttendIt Logo" className="hero-logo" />
-                    <h1 className="brand-name">AttendIt</h1>
+                    <img src="/logo.png" alt="AttenlyX Logo" className="hero-logo" />
+                    <h1 className="brand-name">AttenlyX</h1>
                     <p className="typing-effect">{typedText}<span className="cursor">|</span></p>
 
                     <div className="cta-buttons">

@@ -29,17 +29,18 @@ const SubjectStats = ({ stats, loading }) => {
                         const percentage = subject.total > 0
                             ? ((subject.attended / subject.total) * 100).toFixed(1)
                             : 0;
+                        const isDanger = subject.total > 0 && percentage < 75;
 
                         return (
-                            <div key={index} className={`subject-stat ${percentage < 75 ? 'danger' : ''}`}>
+                            <div key={index} className={`subject-stat ${isDanger ? 'danger' : ''}`}>
                                 <h4>{subject.name}</h4>
                                 <div className="progress-bar">
                                     <div
-                                        className={`progress-fill ${percentage < 75 ? 'bg-danger' : 'bg-success'}`}
+                                        className={`progress-fill ${isDanger ? 'bg-danger' : 'bg-success'}`}
                                         style={{ width: `${percentage}%` }}
                                     ></div>
                                 </div>
-                                <p className={`stat-text ${percentage < 75 ? 'text-danger' : 'text-success'}`}>
+                                <p className={`stat-text ${isDanger ? 'text-danger' : 'text-success'}`}>
                                     {subject.attended} / {subject.total} classes ({percentage}%)
                                 </p>
                             </div>

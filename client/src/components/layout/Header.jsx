@@ -26,8 +26,8 @@ const Header = () => {
                         </button>
                     ) : (
                         <Link to={logoDestination} className="logo-link">
-                            <img src="/logo.png" alt="AttendIt Logo" className="header-logo" />
-                            <span className="logo-text">AttendIt</span>
+                            <img src="/logo.png" alt="AttenlyX Logo" className="header-logo" />
+                            <span className="logo-text">AttenlyX</span>
                         </Link>
                     )}
                 </div>

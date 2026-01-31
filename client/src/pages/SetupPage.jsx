@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { timetableService } from '../services/timetableService';
 import TimingsStep from '../components/setup/TimingsStep';
@@ -22,6 +22,35 @@ const SetupPage = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            const courseId = location.state?.courseId || localStorage.getItem('selectedCourse');
+            if (courseId) {
+                setLoading(true);
+                try {
+                    const data = await timetableService.getConfig(courseId);
+                    if (data) {
+                        setConfig({
+                            startTime: data.startTime || '09:00',
+                            endTime: data.endTime || '16:30',
+                            periodDuration: data.periodDuration || 45,
+                            lunchStart: data.lunchStart || '12:45',
+                            lunchDuration: data.lunchDuration || 45,
+                            subjects: data.subjects || [],
+                            timetable: data.timetable || {}
+                        });
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch config:', err);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchConfig();
+    }, [location.state?.courseId]);
 
     const updateConfig = (updates) => {
         setConfig({ ...config, ...updates });

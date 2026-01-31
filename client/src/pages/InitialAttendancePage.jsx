@@ -5,6 +5,9 @@ import DotGrid from '../components/common/DotGrid';
 
 const InitialAttendancePage = () => {
     const [attendance, setAttendance] = useState('');
+    const [totalClasses, setTotalClasses] = useState('');
+    const [attendedClasses, setAttendedClasses] = useState('');
+    const [inputType, setInputType] = useState('percentage'); // 'percentage' or 'counts'
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -13,18 +16,43 @@ const InitialAttendancePage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            // Treat percentage as attended classes out of 100 base classes
-            // This allows it to be averaged correctly with future data.
-            const percentage = parseFloat(attendance);
+            let finalTotal = 100;
+            let finalAttended = 0;
+
+            if (inputType === 'percentage') {
+                finalAttended = parseFloat(attendance);
+            } else {
+                finalTotal = parseInt(totalClasses);
+                finalAttended = parseInt(attendedClasses);
+            }
+
             const courseId = location.state?.courseId || localStorage.getItem('selectedCourse');
-            await attendanceService.saveInitialStats(100, percentage, courseId);
+            await attendanceService.saveInitialStats(finalTotal, finalAttended, courseId);
             navigate('/setup', { state: { useSimpleDashboard: true, courseId } });
         } catch (error) {
             console.error('Failed to save initial attendance:', error);
-            // Even if it fails, let's allow them to continue to setup
             navigate('/setup', { state: { useSimpleDashboard: true } });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePercentageChange = (val) => {
+        setAttendance(val);
+        if (val !== '') {
+            setInputType('percentage');
+            setTotalClasses('');
+            setAttendedClasses('');
+        }
+    };
+
+    const handleCountChange = (type, val) => {
+        if (type === 'total') setTotalClasses(val);
+        else setAttendedClasses(val);
+
+        if (val !== '') {
+            setInputType('counts');
+            setAttendance('');
         }
     };
 
@@ -48,14 +76,47 @@ const InitialAttendancePage = () => {
                                 <input
                                     type="number"
                                     value={attendance}
-                                    onChange={(e) => setAttendance(e.target.value)}
+                                    onChange={(e) => handlePercentageChange(e.target.value)}
                                     placeholder="e.g. 75"
                                     min="0"
                                     max="100"
-                                    required
+                                    required={inputType === 'percentage'}
                                     disabled={loading}
                                 />
                             </div>
+
+                            <div className="separator-container my-3">
+                                <span className="separator-text">OR</span>
+                            </div>
+
+                            <div className="form-row" style={{ display: 'flex', gap: '15px' }}>
+                                <div className="form-group" style={{ flex: 1 }}>
+                                    <label>Number of classes held</label>
+                                    <input
+                                        type="number"
+                                        value={totalClasses}
+                                        onChange={(e) => handleCountChange('total', e.target.value)}
+                                        placeholder="e.g. 40"
+                                        min="0"
+                                        required={inputType === 'counts'}
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <div className="form-group" style={{ flex: 1 }}>
+                                    <label>Number of classes attended</label>
+                                    <input
+                                        type="number"
+                                        value={attendedClasses}
+                                        onChange={(e) => handleCountChange('attended', e.target.value)}
+                                        placeholder="e.g. 30"
+                                        min="0"
+                                        max={totalClasses}
+                                        required={inputType === 'counts'}
+                                        disabled={loading}
+                                    />
+                                </div>
+                            </div>
+
                             <button type="submit" className="btn-primary" disabled={loading}>
                                 {loading ? 'Saving...' : 'Next: Setup Timetable'}
                             </button>

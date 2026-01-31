@@ -4,10 +4,10 @@ const Footer = () => {
     return (
         <footer className="main-footer">
             <div className="footer-container">
-                <p>&copy; {new Date().getFullYear()} AttendIt. Mark daily, stay eligible, succeed.</p>
+                <p>&copy; {new Date().getFullYear()} AttenlyX. Mark daily, stay eligible, succeed.</p>
                 <div className="footer-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                    <span className="footer-link-static">Privacy Policy</span>
+                    <span className="footer-link-static">Terms of Service</span>
                 </div>
             </div>
         </footer>
