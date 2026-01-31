@@ -8,6 +8,16 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(authService.getUser());
     const [loading, setLoading] = useState(false);
 
+    const extractError = (error, defaultMsg) => {
+        const data = error.response?.data;
+        if (data?.msg) return data.msg;
+        if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+            return data.errors[0].msg;
+        }
+        if (data?.message) return data.message;
+        return defaultMsg;
+    };
+
     const login = async (username, password) => {
         setLoading(true);
         try {
@@ -18,7 +28,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             return {
                 success: false,
-                error: error.response?.data?.message || 'Login failed'
+                error: extractError(error, 'Login failed')
             };
         } finally {
             setLoading(false);
@@ -35,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             return {
                 success: false,
-                error: error.response?.data?.message || 'Signup failed'
+                error: extractError(error, 'Signup failed')
             };
         } finally {
             setLoading(false);
