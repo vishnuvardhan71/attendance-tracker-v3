@@ -56,6 +56,14 @@ const InitialAttendancePage = () => {
         }
     };
 
+    const blockInvalidChars = (e, allowDecimal = false) => {
+        const invalidChars = ['e', 'E', '+', '-'];
+        if (!allowDecimal) invalidChars.push('.');
+        if (invalidChars.includes(e.key)) {
+            e.preventDefault();
+        }
+    };
+
     const handleSkip = () => {
         const courseId = location.state?.courseId || localStorage.getItem('selectedCourse');
         navigate('/setup', { state: { useSimpleDashboard: false, courseId } });
@@ -77,6 +85,7 @@ const InitialAttendancePage = () => {
                                     type="number"
                                     value={attendance}
                                     onChange={(e) => handlePercentageChange(e.target.value)}
+                                    onKeyDown={(e) => blockInvalidChars(e, true)}
                                     placeholder="e.g. 75"
                                     min="0"
                                     max="100"
@@ -96,6 +105,7 @@ const InitialAttendancePage = () => {
                                         type="number"
                                         value={totalClasses}
                                         onChange={(e) => handleCountChange('total', e.target.value)}
+                                        onKeyDown={(e) => blockInvalidChars(e, false)}
                                         placeholder="e.g. 40"
                                         min="0"
                                         required={inputType === 'counts'}
@@ -108,6 +118,7 @@ const InitialAttendancePage = () => {
                                         type="number"
                                         value={attendedClasses}
                                         onChange={(e) => handleCountChange('attended', e.target.value)}
+                                        onKeyDown={(e) => blockInvalidChars(e, false)}
                                         placeholder="e.g. 30"
                                         min="0"
                                         max={totalClasses}
